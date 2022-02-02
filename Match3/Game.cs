@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
@@ -110,10 +111,102 @@ namespace Match3
             }
         }
 
-        private void DeleteMatches(Action<Tile> unregisterTile)
+        public Color GetKeyByValue(int value, Dictionary<Color, int> myDictionary)
         {
+            foreach (var recordOfDictionary in myDictionary)
+            {
+                if (recordOfDictionary.Value.Equals(value))
+                    return recordOfDictionary.Key;
+            }
+            return Colors.Black;
+        }
+
+        private void DeleteMatches(Action<Tile> unregisterTile, Action<Tile> registerTile)
+        {
+            bool f = true;
+            bool b = true;
+            Dictionary<Color, int> colorCount = new Dictionary<Color, int>()
+            {
+                { Colors.Red, 0 },
+                { Colors.Green, 0 },
+                { Colors.Blue, 0 },
+                { Colors.LightYellow, 0 },
+                { Colors.RosyBrown, 0 },
+            };
             foreach (var match in _lastMatches)
             {
+                if (_lastMatches.Count == 4)
+                {
+                    foreach (var m in _lastMatches)
+                    {
+                        colorCount[m.Color] += 1;
+                    }
+                    if (colorCount.Values.Max() == 4 && f)
+                    {
+                        f = false;
+                        var tempColor = GetKeyByValue(4, colorCount);
+                        var tempBonus = new Bonus(match.Top + 8, match.Left, tempColor);
+                        tempBonus.Line = true;
+                        unregisterTile(_board[match.Top + 8, match.Left]);
+                        _board[match.Top + 8, match.Left] = tempBonus;
+                        registerTile(_board[match.Top + 8, match.Left]);
+
+                    }
+                }
+                if (_board[match.Top + 8, match.Left] is Bonus)
+                {
+                    Random rand = new Random();
+                    var axis = rand.Next(100) < 50 ? true : false;
+                    if(axis)
+                    {
+                        for (var i = 0; i < 8; i++)
+                        {
+                            unregisterTile(_board[match.Top + 8, i]);
+                            _board[match.Top + 8, i] = null;
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        for (var i = 8; i < 16; i++)
+                        {
+                            unregisterTile(_board[i, match.Left]);
+                            _board[i, match.Left] = null;
+                        }
+                        return;
+                    }
+                    
+                }
+                if (_lastMatches.Count >= 5)
+                {
+                    foreach (var m in _lastMatches)
+                    {
+                        colorCount[m.Color] += 1;
+                    }
+                    if (colorCount.Values.Max() == 5 && b)
+                    {
+                        b = false;
+                        var tempColor = GetKeyByValue(4, colorCount);
+                        var tempBonus = new Bonus(match.Top + 8, match.Left, tempColor);
+                        tempBonus.Bomb = true;
+                        unregisterTile(_board[match.Top + 8, match.Left]);
+                        _board[match.Top + 8, match.Left] = tempBonus;
+                        registerTile(_board[match.Top + 8, match.Left]);
+                    }
+                }
+                if (_board[match.Top + 8, match.Left] is Bonus)
+                {
+                    for (var i = (match.Top - 1) + 8; i < (match.Top + 1) + 8; i++)
+                    {
+                        for (var j = match.Left - 1; j < match.Left + 1; j++)
+                        {
+                            unregisterTile(_board[i, j]);
+                            _board[i, j] = null;
+                        }
+                    }
+                    return;
+                }
+
                 unregisterTile(_board[match.Top + 8, match.Left]);
                 _board[match.Top + 8, match.Left] = null;
             }
@@ -123,7 +216,7 @@ namespace Match3
             Action<Tile> tileDropAnimation, Action<Tile> registerTile,
             Action<Tile> unregisterTile)
         {
-            DeleteMatches(unregisterTile);
+            DeleteMatches(unregisterTile, registerTile);
             var dropLengths = new int[8];
             for (int i = 16 - 1; i >= 0; i--)
             {

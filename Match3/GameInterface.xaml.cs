@@ -94,6 +94,7 @@ namespace Match3
                 {
                     _game.DeleteAndDropTiles(
                         DropAnimation, RegisterTile, UnregisterTile);
+                    //написать создание бонуса
                 }
             };
             tile.Shape.RenderTransform.BeginAnimation(
@@ -173,7 +174,7 @@ namespace Match3
         }
 
         private void UnregisterTile(Tile tile)
-        {
+        {    
             GameCanvas.Children.Remove(tile.Shape);
         }
 

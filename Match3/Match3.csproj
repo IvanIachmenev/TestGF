@@ -68,6 +68,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Bonus.cs" />
+    <Compile Include="BonusShape.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Switcher.cs" />
     <Compile Include="Tile.cs" />

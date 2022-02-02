@@ -6,7 +6,7 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:local="clr-namespace:Match3"
         mc:Ignorable="d"
-        Title="Match-3" Height="500" Width="450" ResizeMode="NoResize">
+        Title="Match3" Height="500" Width="450" ResizeMode="NoResize">
     <Grid>
 
     </Grid>
